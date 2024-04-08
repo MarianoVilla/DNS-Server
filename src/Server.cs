@@ -1,3 +1,4 @@
+using codecrafters_dns_server.src;
 using System;
 using System.Net;
 using System.Net.Sockets;
@@ -20,14 +21,11 @@ while (true)
     // Receive data
     IPEndPoint sourceEndPoint = new IPEndPoint(IPAddress.Any, 0);
     byte[] receivedData = udpClient.Receive(ref sourceEndPoint);
-    string receivedString = Encoding.ASCII.GetString(receivedData);
 
-    Console.WriteLine($"Received {receivedData.Length} bytes from {sourceEndPoint}: {receivedString}");
+    var Message = new DnsMessage(receivedData);
 
-    // Create an empty response
-    byte[] response = Encoding.ASCII.GetBytes("");
+    byte[] response = Message.GetResponse();
 
-    // Send response
     udpClient.Send(response, response.Length, sourceEndPoint);
 }
 
