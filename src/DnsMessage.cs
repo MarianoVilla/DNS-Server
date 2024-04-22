@@ -78,7 +78,7 @@ namespace codecrafters_dns_server.src
                 0x00, 0x01, // Class
                 0x00, 0x00, 0x00, 0x3c, //TTL
                 0x00, 0x04, //RDLENGTH
-                0x4c, 0x4c, 0x15, 0x15 //RDATA
+                0x4c, 0x4c, 0x15, 0x15 //RDATA 
             };
 
             Response.AddRange(AnswerBytes);
