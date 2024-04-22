@@ -59,6 +59,14 @@ namespace codecrafters_dns_server.src
 
             Header.ANCOUNT = 1;
 
+            //Hardcoded stuff
+            Header.QR = true;
+            Header.AA = false;
+            Header.TC = false;
+            Header.RA = false;
+            Header.Z = 0;
+            Header.RCODE = (byte)(Header.OPCODE == 0 ? 0 : 4);
+
             Response.AddRange(Header.GetBytes());
 
             Response.AddRange(Questions.SelectMany(q => q.GetBytes()));

@@ -48,15 +48,15 @@ namespace codecrafters_dns_server.src
             Response[0] = (byte)(ID >> 8);
             Response[1] = (byte)(ID & 0b11111111);
             Response[2] = (byte)(
-                1 << 7 |
+                QR.ToInt() << 7 |
                 OPCODE << 3 |
-                (AA ? 1 : 0) << 2 |
-                (TC ? 1 : 0) << 1 |
-                (RD ? 1 : 0)
+                AA.ToInt() << 2 |
+                TC.ToInt() << 1 |
+                RD.ToInt()
                 );
 
             Response[3] = (byte)(
-                (RA ? 1 : 0) << 7 |
+                RA.ToInt() << 7 |
                 Z << 4 |
                 RCODE
                 );
