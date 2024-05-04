@@ -69,19 +69,21 @@ namespace codecrafters_dns_server.src
 
             Response.AddRange(Header.GetBytes());
 
-            Response.AddRange(Questions.SelectMany(q => q.GetBytes()));
+            var FirstQuestion = Questions.FirstOrDefault() 
+                ?? throw new Exception("Expected at least one question, DUUUDE!");
+            
+            Response.AddRange(FirstQuestion.GetBytes());
 
-            byte[] AnswerBytes = new byte[] {
-                0x0c, 0x63, 0x6f, 0x64, 0x65, 0x63, 0x72, 0x61, 0x66, 0x74, 0x65, 0x72,
-                0x73, 0x02, 0x69, 0x6f, 0x00, //Name
+            byte[] HardcodedAnswer = [
+                .. FirstQuestion.Name.GetBytes(),
                 0x00, 0x01, // Type
                 0x00, 0x01, // Class
                 0x00, 0x00, 0x00, 0x3c, //TTL
                 0x00, 0x04, //RDLENGTH
                 0x4c, 0x4c, 0x15, 0x15 //RDATA 
-            };
+            ];
 
-            Response.AddRange(AnswerBytes);
+            Response.AddRange(HardcodedAnswer);
 
             return Response.ToArray();
         }
