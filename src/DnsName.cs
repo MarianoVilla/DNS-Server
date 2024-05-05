@@ -18,22 +18,31 @@ namespace codecrafters_dns_server.src
         void ParseLabels(byte[] Bytes, int Offset)
         {
             int Pointer = Offset;
+            bool Compressed = false;
             while (Bytes[Pointer] != 0)
             {
                 if ((Bytes[Pointer] & 0b_1100_0000) == 192) //Is compressed
                 {
-                    Pointer = (Bytes[Pointer] & 0b_0011_1111);
+                    Pointer = ((Bytes[Pointer] & 0b_0011_1111) << 8) | Bytes[Pointer + 1];
+                    ByteCount += 2;
+                    Compressed = true;
                 }
                 else
                 {
                     var Length = Bytes[Pointer];
                     Pointer++;
                     Labels.Add(Encoding.ASCII.GetString(Bytes, Pointer, Length));
-                    ByteCount += Length + 1;
+                    if(!Compressed)
+                    {
+                        ByteCount += Length + 1;
+                    }
                     Pointer += Length;
                 }
             }
-            ByteCount++;
+            if (!Compressed)
+            {
+                ByteCount++;
+            }
         }
         public byte[] GetBytes()
         {

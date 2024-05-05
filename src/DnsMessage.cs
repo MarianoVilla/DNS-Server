@@ -69,25 +69,30 @@ namespace codecrafters_dns_server.src
             HeaderBytes.Print(nameof(Header));
             Response.AddRange(HeaderBytes);
 
-            var FirstQuestion = Questions.FirstOrDefault() 
-                ?? throw new Exception("Expected at least one question, DUUUDE!");
 
-            var FirstQuestionBytes = FirstQuestion.GetBytes();
-            FirstQuestionBytes.Print(nameof(FirstQuestionBytes));
-            Response.AddRange(FirstQuestionBytes);
-
-            IEnumerable<byte> HardcodedAnswer =
-                FirstQuestion.Name.GetBytes().Concat(new byte[] {
+            var Answers = new List<IEnumerable<byte>>();
+            foreach(var Question in Questions)
+            {
+                var QBytes = Question.GetBytes();
+                QBytes.Print(nameof(QBytes));
+                Response.AddRange(QBytes);
+                
+                IEnumerable<byte> HardcodedAnswer =
+                    Question.Name.GetBytes().Concat(new byte[] {
                 0x00, 0x01, // Type
                 0x00, 0x01, // Class
                 0x00, 0x00, 0x00, 0x3c, //TTL
                 0x00, 0x04, //RDLENGTH
                 0x4c, 0x4c, 0x15, 0x15 //RDATA 
-            });
+                });
+                Answers.Add(HardcodedAnswer);
+            }   
 
-            HardcodedAnswer.Print(nameof(HardcodedAnswer));
-
-            Response.AddRange(HardcodedAnswer);
+            foreach(var Answer in Answers)
+            {
+                Answer.Print(nameof(Answer));
+                Response.AddRange(Answer);
+            }
 
             return Response.ToArray();
         }

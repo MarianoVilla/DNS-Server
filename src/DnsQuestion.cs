@@ -12,6 +12,7 @@ namespace codecrafters_dns_server.src
         public ushort Type { get; set; }
         public ushort Class { get; set; }
         public int ByteCount => Name.ByteCount + 4;
+        public int UncompressedByteCount => Name.GetBytes().Length + 4;
         public DnsQuestion(byte[] QuestionsBytes, int Offset)
         {
             this.Name = new DnsName(QuestionsBytes, Offset);
@@ -23,7 +24,7 @@ namespace codecrafters_dns_server.src
         }
         public byte[] GetBytes()
         { 
-            var Bytes = new byte[this.ByteCount];
+            var Bytes = new byte[this.UncompressedByteCount];
             var NameBytes = Name.GetBytes();
 
             Array.Copy(NameBytes, 0, Bytes, 0, NameBytes.Length);
