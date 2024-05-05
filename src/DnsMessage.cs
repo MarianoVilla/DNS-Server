@@ -55,8 +55,6 @@ namespace codecrafters_dns_server.src
         {
             var Response = new List<byte>();
 
-            Header.ANCOUNT = 1;
-
             //Hardcoded stuff
             Header.QR = true;
             Header.AA = false;
@@ -64,6 +62,9 @@ namespace codecrafters_dns_server.src
             Header.RA = false;
             Header.Z = 0;
             Header.RCODE = (byte)(Header.OPCODE == 0 ? 0 : 4);
+            Header.ARCOUNT = 0;
+
+            Header.ANCOUNT = (byte)Questions.Count();
 
             var HeaderBytes = Header.GetBytes();
             HeaderBytes.Print(nameof(Header));

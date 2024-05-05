@@ -19,7 +19,7 @@ namespace codecrafters_dns_server.src
             {
                 Console.Write($"[{i}]: 0x{Bytes.ElementAt(i):X2}, ");
             }
-            Console.WriteLine("\n************");
+            Console.WriteLine("\n");
         }
 
     }
