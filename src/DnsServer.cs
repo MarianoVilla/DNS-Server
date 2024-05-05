@@ -33,6 +33,8 @@ namespace codecrafters_dns_server.src
                 IPEndPoint SourceEndpoint = new(IPAddress.Any, 0);
                 byte[] Received = Client.Receive(ref SourceEndpoint);
 
+                Received.Print(nameof(Received));
+
                 var Message = new DnsMessage(Received);
 
                 byte[] Response = Message.GetResponse();

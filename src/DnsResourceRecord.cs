@@ -11,7 +11,7 @@
         public List<byte> RDATA { get; set; } = new List<byte>();
         public DnsResourceRecord(byte[] Bytes)
         {
-            Name = new DnsName(Bytes);
+            Name = new DnsName(Bytes, 0);
 
             Type = (ushort)((Bytes[Name.ByteCount] << 8) | Bytes[Name.ByteCount + 1]);
             Class = (ushort)((Bytes[Name.ByteCount + 2] << 8) | Bytes[Name.ByteCount + 3]);

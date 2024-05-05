@@ -12,11 +12,11 @@ namespace codecrafters_dns_server.src
         public ushort Type { get; set; }
         public ushort Class { get; set; }
         public int ByteCount => Name.ByteCount + 4;
-        public DnsQuestion(byte[] QuestionsBytes)
+        public DnsQuestion(byte[] QuestionsBytes, int Offset)
         {
-            this.Name = new DnsName(QuestionsBytes);
+            this.Name = new DnsName(QuestionsBytes, Offset);
 
-            var NameBytes = Name.ByteCount;
+            var NameBytes = Name.ByteCount + Offset;
 
             this.Type = (ushort)(QuestionsBytes[NameBytes] << 8 | QuestionsBytes[NameBytes + 1]);
             this.Class = (ushort)(QuestionsBytes[NameBytes + 2] << 8 | QuestionsBytes[NameBytes + 3]);

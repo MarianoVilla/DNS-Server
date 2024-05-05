@@ -40,16 +40,14 @@ namespace codecrafters_dns_server.src
         }
         void ParseQuestions()
         {
-            var HeaderlessBytes = MessageBytes[12..];
             var QuestionCount = this.Header.QDCOUNT;
-            var ProcessedBytes = 0;
+            var ProcessedBytes = 12;
             while (QuestionCount > 0)
             {
                 QuestionCount--;
-                var Q = new DnsQuestion(HeaderlessBytes);
+                var Q = new DnsQuestion(MessageBytes, ProcessedBytes);
                 Questions.Add(Q);
                 ProcessedBytes += Q.ByteCount;
-                HeaderlessBytes = MessageBytes[ProcessedBytes..]; //WAIITTTTT, shouldn't this be HeaderlessBytes[..]?
             }
         }
 
@@ -67,12 +65,16 @@ namespace codecrafters_dns_server.src
             Header.Z = 0;
             Header.RCODE = (byte)(Header.OPCODE == 0 ? 0 : 4);
 
-            Response.AddRange(Header.GetBytes());
+            var HeaderBytes = Header.GetBytes();
+            HeaderBytes.Print(nameof(Header));
+            Response.AddRange(HeaderBytes);
 
             var FirstQuestion = Questions.FirstOrDefault() 
                 ?? throw new Exception("Expected at least one question, DUUUDE!");
-            
-            Response.AddRange(FirstQuestion.GetBytes());
+
+            var FirstQuestionBytes = FirstQuestion.GetBytes();
+            FirstQuestionBytes.Print(nameof(FirstQuestionBytes));
+            Response.AddRange(FirstQuestionBytes);
 
             IEnumerable<byte> HardcodedAnswer =
                 FirstQuestion.Name.GetBytes().Concat(new byte[] {
@@ -82,6 +84,8 @@ namespace codecrafters_dns_server.src
                 0x00, 0x04, //RDLENGTH
                 0x4c, 0x4c, 0x15, 0x15 //RDATA 
             });
+
+            HardcodedAnswer.Print(nameof(HardcodedAnswer));
 
             Response.AddRange(HardcodedAnswer);
 

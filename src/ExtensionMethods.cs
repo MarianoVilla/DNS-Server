@@ -12,5 +12,15 @@ namespace codecrafters_dns_server.src
         {
             return Boolean ? 1 : 0;
         }
+        public static void Print(this IEnumerable<byte> Bytes, string? Title = null) 
+        {
+            Console.WriteLine($"************{Title}************");
+            for (int i = 0; i < Bytes.Count(); i++)
+            {
+                Console.Write($"[{i}]: 0x{Bytes.ElementAt(i):X2}, ");
+            }
+            Console.WriteLine("\n************");
+        }
+
     }
 }
