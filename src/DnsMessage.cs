@@ -11,7 +11,7 @@ namespace codecrafters_dns_server.src
         public byte[] MessageBytes { get; }
         public DnsHeader Header { get; set; }
         public List<DnsQuestion> Questions { get; set; } = new List<DnsQuestion>();
-        public List<DnsResourceRecord> Answer { get; set; }
+        public List<DnsResourceRecord> Answer { get; set; } = new List<DnsResourceRecord>();
         public DnsMessage(byte[] MessageBytes)
         {
             this.MessageBytes = MessageBytes ?? throw new ArgumentNullException(nameof(MessageBytes));
@@ -20,12 +20,15 @@ namespace codecrafters_dns_server.src
             ParseQuestions();
             ParseAnswers();
         }
+        public DnsMessage()
+        {
+            
+        }
 
         void ParseAnswers()
         {
             if (this.Header.ANCOUNT == 0)
                 return;
-            this.Answer = new List<DnsResourceRecord>();
             var RemainingBytes = MessageBytes[(12 + Questions.Sum(q => q.ByteCount))..];
             var AnswerRecordCount = this.Header.ANCOUNT;
             var ProcessedBytes = 0;
@@ -51,51 +54,23 @@ namespace codecrafters_dns_server.src
             }
         }
 
-        public byte[] GetResponse()
+        public byte[] GetBytes()
         {
-            var Response = new List<byte>();
+            var Bytes = new List<byte>();
 
-            //Hardcoded stuff
-            Header.QR = true;
-            Header.AA = false;
-            Header.TC = false;
-            Header.RA = false;
-            Header.Z = 0;
-            Header.RCODE = (byte)(Header.OPCODE == 0 ? 0 : 4);
-            Header.ARCOUNT = 0;
+            Bytes.AddRange(Header.GetBytes());
 
-            Header.ANCOUNT = (byte)Questions.Count();
-
-            var HeaderBytes = Header.GetBytes();
-            HeaderBytes.Print(nameof(Header));
-            Response.AddRange(HeaderBytes);
-
-
-            var Answers = new List<IEnumerable<byte>>();
-            foreach(var Question in Questions)
+            foreach(var Q in Questions)
             {
-                var QBytes = Question.GetBytes();
-                QBytes.Print(nameof(QBytes));
-                Response.AddRange(QBytes);
-                
-                IEnumerable<byte> HardcodedAnswer =
-                    Question.Name.GetBytes().Concat(new byte[] {
-                0x00, 0x01, // Type
-                0x00, 0x01, // Class
-                0x00, 0x00, 0x00, 0x3c, //TTL
-                0x00, 0x04, //RDLENGTH
-                0x4c, 0x4c, 0x15, 0x15 //RDATA 
-                });
-                Answers.Add(HardcodedAnswer);
+                Bytes.AddRange(Q.GetBytes());
             }   
 
-            foreach(var Answer in Answers)
+            foreach(var A in Answer)
             {
-                Answer.Print(nameof(Answer));
-                Response.AddRange(Answer);
+                Bytes.AddRange(A.GetBytes());
             }
 
-            return Response.ToArray();
+            return Bytes.ToArray();
         }
     }
 }

@@ -26,5 +26,30 @@
             }
 
         }
+        public byte[] GetBytes()
+        {
+            var Bytes = new List<byte>();
+
+            Bytes.AddRange(Name.GetBytes());
+
+            Bytes.Add((byte)(Type >> 8));
+            Bytes.Add((byte)Type);
+
+            Bytes.Add((byte)(Class >> 8));
+            Bytes.Add((byte)Class);
+
+            Bytes.Add((byte)(TTL >> 24));
+            Bytes.Add((byte)(TTL >> 16));
+            Bytes.Add((byte)(TTL >> 8));
+            Bytes.Add((byte)TTL);
+
+            Bytes.Add((byte)(RDLENGTH >> 8));
+            Bytes.Add((byte)RDLENGTH);
+
+            Bytes.AddRange(RDATA);
+
+            return Bytes.ToArray();
+
+        }
     }
 }
