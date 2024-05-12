@@ -15,12 +15,14 @@ namespace codecrafters_dns_server.src
         public ILogger Logger { get; }
         public int Port { get; }
         public IPAddress Ip { get; }
+        public IPEndPoint? ForwardServer { get; }
 
-        public DnsServer(ILogger Logger, int Port, IPAddress Ip)
+        public DnsServer(ILogger Logger, int Port, IPAddress Ip, IPEndPoint? ForwardServer = null)
         {
             this.Logger = Logger;
             this.Port = Port;
             this.Ip = Ip;
+            this.ForwardServer = ForwardServer;
         }
 
         public void Start()
@@ -34,9 +36,9 @@ namespace codecrafters_dns_server.src
                 IPEndPoint SourceEndpoint = new(IPAddress.Any, 0);
                 byte[] RequestBytes = Client.Receive(ref SourceEndpoint);
 
-                RequestBytes.Print(nameof(RequestBytes));
+                Logger.LogBytes(RequestBytes, nameof(RequestBytes));
 
-                var RequestMessage = new DnsMessage(RequestBytes);
+                var RequestMessage = new DnsMessage(RequestBytes, Logger);
 
                 byte[] Response = ProcessRequest(RequestMessage).GetBytes();
 
@@ -44,9 +46,26 @@ namespace codecrafters_dns_server.src
             }
 
         }
+        DnsMessage ForwardRequest(DnsMessage Request)
+        {
+            if(ForwardServer is null)
+            {
+                throw new InvalidOperationException("Attempted to forward request but no FWD server specified!");
+            }
+            UdpClient Client = new();
+            Client.Connect(ForwardServer);
+            Client.Send(Request.GetBytes());
+
+            var RecvEndpoint = new IPEndPoint(IPAddress.Any, 0);
+            var ResponseBytes = Client.Receive(ref RecvEndpoint);
+            Logger.LogBytes(ResponseBytes, $"Response from FWD server");
+            var ParsedResponse = new DnsMessage(ResponseBytes, Logger);
+            return ParsedResponse;
+        }
         DnsMessage ProcessRequest(DnsMessage Request)
         {
-            var Response = new DnsMessage()
+            Request.Header.ARCOUNT = 0;
+            var Response = new DnsMessage(Logger)
             {
                 Header = new DnsHeader(Request.Header.GetBytes())
             };
@@ -63,19 +82,30 @@ namespace codecrafters_dns_server.src
             foreach (var Question in Request.Questions)
             {
 
-                byte[] HardcodedAnswerBytes =
-                    Question.Name.GetBytes().Concat(new byte[] {
-                0x00, 0x01, // Type
-                0x00, 0x01, // Class
-                0x00, 0x00, 0x00, 0x3c, //TTL
-                0x00, 0x04, //RDLENGTH
-                0x4c, 0x4c, 0x15, 0x15 //RDATA 
-                }).ToArray();
+                //byte[] HardcodedAnswerBytes =
+                //    Question.Name.GetBytes().Concat(new byte[] {
+                //0x00, 0x01, // Type
+                //0x00, 0x01, // Class
+                //0x00, 0x00, 0x00, 0x3c, //TTL
+                //0x00, 0x04, //RDLENGTH
+                //0x4c, 0x4c, 0x15, 0x15 //RDATA 
+                //}).ToArray();
 
-                var HardcodedAnswer = new DnsResourceRecord(HardcodedAnswerBytes);
+                var HardcodedAnswer = new DnsResourceRecord(Question.Name, 1, 1, 60, 
+                    IPAddress.Parse("76.76.21.21"));
+
+                DnsResourceRecord? Answer = null;
+                if (ForwardServer is not null)
+                {
+                    Answer = ForwardRequest(Request).Answer.FirstOrDefault();
+                }
+                if (Answer is null)
+                {
+                    Answer = HardcodedAnswer;
+                }
 
                 Response.Questions.Add(Question);
-                Response.Answer.Add(HardcodedAnswer);
+                Response.Answer.Add(Answer);
                 Response.Header.ANCOUNT++;
             }
 

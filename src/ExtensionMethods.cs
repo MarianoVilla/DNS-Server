@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Extensions.Logging;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -12,14 +13,15 @@ namespace codecrafters_dns_server.src
         {
             return Boolean ? 1 : 0;
         }
-        public static void Print(this IEnumerable<byte> Bytes, string? Title = null) 
+        public static void LogBytes(this ILogger Logger, byte[] Bytes, 
+            string? Title = null, LogLevel Level = LogLevel.Information) 
         {
-            Console.WriteLine($"************{Title}************");
+            Logger.Log(Level, $"************{Title}************");
             for (int i = 0; i < Bytes.Count(); i++)
             {
-                Console.Write($"[{i}]: 0x{Bytes.ElementAt(i):X2}, ");
+                Logger.Log(Level, $"[{i}]: 0x{Bytes.ElementAt(i):X2}, ");
             }
-            Console.WriteLine("\n");
+            Logger.Log(Level, "\n");
         }
 
     }

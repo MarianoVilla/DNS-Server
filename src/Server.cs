@@ -6,9 +6,6 @@ using System.Net.Http.Headers;
 using System.Net.Sockets;
 using System.Text;
 
-// You can use print statements as follows for debugging, they'll be visible when running tests.
-Console.WriteLine("Logs from your program will appear here! ");
-
 //byte[] byteArray = new byte[]
 //{
 //    0x0D, 0x5F, 0x01, 0x00, 0x00, 0x02, 0x00, 0x00,
@@ -23,12 +20,29 @@ Console.WriteLine("Logs from your program will appear here! ");
 //var M = new DnsMessage(byteArray);
 
 //M.GetResponse().Print();
+class Program
+{
+    static void Main(string[] args)
+    {
+        using ILoggerFactory factory = LoggerFactory.Create(builder => builder.AddConsole());
+        ILogger Logger = factory.CreateLogger("Program");
+
+        IPEndPoint? ForwardServer = null;
+        if (args is not null && args.Length == 2 && args[0] == "--resolver")
+        {
+            var Splitted = args[1].Split(':');
+            if(Splitted.Length != 2 ) 
+            {
+                var Error = $"Invalid resolver, expected ip:port, got {args[1]}";
+                Logger.LogError(Error);
+            }
+            ForwardServer = new IPEndPoint(IPAddress.Parse(Splitted[0]), ushort.Parse(Splitted[1]));
+        }
 
 
+        var Server = new DnsServer(Logger, 2053, IPAddress.Parse("127.0.0.1"), ForwardServer);
 
-using ILoggerFactory factory = LoggerFactory.Create(builder => builder.AddConsole());
-ILogger Logger = factory.CreateLogger("Program");
+        Server.Start();
 
-var Server = new DnsServer(Logger, 2053, IPAddress.Parse("127.0.0.1"));
-
-Server.Start();
+    }
+}

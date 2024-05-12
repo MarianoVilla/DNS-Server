@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "codecrafters-dns-server": {
+      "commandName": "Project",
+      "commandLineArgs": "--resolver 8.8.8.8:53"
+    }
+  }
+}
