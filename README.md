@@ -1,37 +1,21 @@
 [![progress-banner](https://backend.codecrafters.io/progress/dns-server/ee361376-0d6e-4f84-9abe-5cf60f1fd5d5)](https://app.codecrafters.io/users/codecrafters-bot?r=2qF)
 
-This is a starting point for C# solutions to the
-["Build Your Own DNS server" Challenge](https://app.codecrafters.io/courses/dns-server/overview).
+# Holi.
+En este repo vas a encontrar todo el código del server DNS que hicimos de cero, usando C#.
 
-In this challenge, you'll build a DNS server that's capable of parsing and
-creating DNS packets, responding to DNS queries, handling various record types
-and doing recursive resolve. Along the way we'll learn about the DNS protocol,
-DNS packet format, root servers, authoritative servers, forwarding servers,
-various record types (A, AAAA, CNAME, etc) and more.
+El banner de arriba te indica en qué paso estamos/si lo terminamos.
 
-**Note**: If you're viewing this repo on GitHub, head over to
-[codecrafters.io](https://codecrafters.io) to try the challenge.
+## ¿No entendés nada?
 
-# Passing the first stage
+Yo tampoco, pero todo lo que hay en este repo fue explicado y codeado **en vivo** en YouTube; [acá](https://youtube.com/playlist?list=PL6ZpaevWeaf8LIjIxmhW0de947xkcZvgg&si=g6k-rx-hd_fQG63L) está la playlist.
 
-The entry point for your `your_server.sh` implementation is in `src/Server.cs`.
-Study and uncomment the relevant code, and push your changes to pass the first
-stage:
+## Otros recursos copados:
 
-```sh
-git add .
-git commit -m "pass 1st stage" # any msg
-git push origin master
-```
+* El [crash course de ByteByteGo](https://blog.bytebytego.com/p/a-crash-course-in-dns-domain-name), es excelente.
+* [Este](https://dev.to/joelvarty/dns-101-for-web-developers-5a4f) artículo es una intro ligerita para devs.
+* [Este otro](https://amriunix.com/posts/deep-dive-into-dns-messages/) va un poco más en detalle sobre las partes de un mensaje DNS.
+* Codecrafters recomienda explícitamente [esta guía](https://github.com/EmilHernvall/dnsguide/blob/b52da3b32b27c81e5c6729ac14fe01fef8b1b593/chapter1.md), que está muy buena.
+* [Estos](https://notes.shichao.io/tcpv1/ch11/#the-dns-protocol) apuntes son bastante profundos y claros.
+* [Este sitio](https://www.google.com) tiene un montón de info adicional.
 
-Time to move on to the next stage!
 
-# Stage 2 & beyond
-
-Note: This section is for stages 2 and beyond.
-
-1. Ensure you have `dotnet (6.0)` installed locally
-1. Run `./your_server.sh` to run your program, which is implemented in
-   `src/Server.cs`.
-1. Commit your changes and run `git push origin master` to submit your solution
-   to CodeCrafters. Test output will be streamed to your terminal.
